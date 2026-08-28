@@ -56,6 +56,17 @@ class TicketService:
             raise NotFoundError("ticket was not found")
         return ticket
 
+    def search(
+        self, organization_id: object, query: str | None = None, status: str | None = None
+    ) -> list[Ticket]:
+        self._text(organization_id, "X-Organization")
+        tickets = self._repository.list()
+        if query:
+            tickets = [ticket for ticket in tickets if query.lower() in ticket.subject.lower()]
+        if status:
+            tickets = [ticket for ticket in tickets if ticket.status == status]
+        return sorted(tickets, key=lambda ticket: ticket.created_at, reverse=True)
+
     def change_status(self, organization_id: object, ticket_id: str, data: dict[str, object]) -> Ticket:
         ticket = self.get(organization_id, ticket_id)
         status = data.get("status")
@@ -70,4 +81,3 @@ class TicketService:
         if not isinstance(value, str) or not value.strip():
             raise ValidationError(f"{name} is required")
         return value.strip()
-
