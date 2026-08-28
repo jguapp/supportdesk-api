@@ -1,0 +1,6 @@
+[project]
+name = "supportdesk-api"
+version = "0.1.0"
+description = "Support ticket service for interview practice"
+requires-python = ">=3.11"
+
