@@ -65,6 +65,13 @@ class TicketService:
         self._repository.save(updated)
         return updated
 
+    def assign(self, organization_id: object, ticket_id: str, data: dict[str, object]) -> Ticket:
+        ticket = self.get(organization_id, ticket_id)
+        assignee = data.get("assignee_id")
+        if assignee is not None:
+            assignee = self._text(assignee, "assignee_id")
+        return ticket.assign_to(assignee)
+
     @staticmethod
     def _text(value: object, name: str) -> str:
         if not isinstance(value, str) or not value.strip():
