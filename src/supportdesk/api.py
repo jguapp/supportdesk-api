@@ -24,6 +24,10 @@ class SupportDeskApi:
                     ticket_id = suffix.removesuffix("/status").rstrip("/")
                     ticket = self._service.change_status(organization, ticket_id, self._json(environ))
                     return self._respond(start_response, HTTPStatus.OK, ticket.to_dict())
+                if method == "POST" and suffix.endswith("/comments"):
+                    ticket_id = suffix.removesuffix("/comments").rstrip("/")
+                    ticket = self._service.add_comment(organization, ticket_id, self._json(environ))
+                    return self._respond(start_response, HTTPStatus.CREATED, ticket.to_dict())
                 if method == "GET" and "/" not in suffix:
                     return self._respond(start_response, HTTPStatus.OK, self._service.get(organization, suffix).to_dict())
             return self._respond(start_response, HTTPStatus.NOT_FOUND, {"error": "route not found"})
