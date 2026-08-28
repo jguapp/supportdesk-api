@@ -24,6 +24,10 @@ class SupportDeskApi:
                     ticket_id = suffix.removesuffix("/status").rstrip("/")
                     ticket = self._service.change_status(organization, ticket_id, self._json(environ))
                     return self._respond(start_response, HTTPStatus.OK, ticket.to_dict())
+                if method == "PATCH" and suffix.endswith("/assignee"):
+                    ticket_id = suffix.removesuffix("/assignee").rstrip("/")
+                    ticket = self._service.assign(organization, ticket_id, self._json(environ))
+                    return self._respond(start_response, HTTPStatus.OK, ticket.to_dict())
                 if method == "GET" and "/" not in suffix:
                     return self._respond(start_response, HTTPStatus.OK, self._service.get(organization, suffix).to_dict())
             return self._respond(start_response, HTTPStatus.NOT_FOUND, {"error": "route not found"})

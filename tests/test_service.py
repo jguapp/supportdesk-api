@@ -33,6 +33,10 @@ class TicketServiceTests(unittest.TestCase):
         with self.assertRaises(ValidationError):
             self.service.create("org1", "u1", {"subject": "Help", "priority": "now"})
 
+    def test_ticket_can_be_assigned(self):
+        ticket = self.service.assign("org1", "t1", {"assignee_id": "agent-2"})
+        self.assertEqual("agent-2", ticket.assignee_id)
+
 
 if __name__ == "__main__":
     unittest.main()

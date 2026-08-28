@@ -13,9 +13,13 @@ class Ticket:
     status: str
     priority: str
     created_at: datetime
+    assignee_id: str | None = None
 
     def move_to(self, status: str) -> "Ticket":
         return replace(self, status=status)
+
+    def assign_to(self, assignee_id: str | None) -> "Ticket":
+        return replace(self, assignee_id=assignee_id)
 
     def to_dict(self) -> dict[str, object]:
         return {
@@ -24,6 +28,7 @@ class Ticket:
             "status": self.status,
             "priority": self.priority,
             "created_at": self.created_at.isoformat(),
+            "assignee_id": self.assignee_id,
         }
 
 
@@ -39,4 +44,3 @@ class TicketRepository:
 
     def list(self) -> list[Ticket]:
         return list(self._tickets.values())
-
