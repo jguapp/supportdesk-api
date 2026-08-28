@@ -33,6 +33,10 @@ class TicketServiceTests(unittest.TestCase):
         with self.assertRaises(ValidationError):
             self.service.create("org1", "u1", {"subject": "Help", "priority": "now"})
 
+    def test_comment_is_appended_to_ticket(self):
+        ticket = self.service.add_comment("org1", "t1", {"author_id": "agent-1", "body": "Investigating"})
+        self.assertEqual("Investigating", ticket.comments[0].body)
+
 
 if __name__ == "__main__":
     unittest.main()

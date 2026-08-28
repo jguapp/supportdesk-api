@@ -4,7 +4,7 @@ from collections.abc import Callable
 from datetime import datetime, timezone
 from uuid import uuid4
 
-from .domain import Ticket, TicketRepository
+from .domain import Comment, Ticket, TicketRepository
 
 
 class ConflictError(Exception):
@@ -62,6 +62,14 @@ class TicketService:
         if status not in TRANSITIONS[ticket.status]:
             raise ConflictError(f"cannot move ticket from {ticket.status} to {status}")
         updated = ticket.move_to(status)
+        self._repository.save(updated)
+        return updated
+
+    def add_comment(self, organization_id: object, ticket_id: str, data: dict[str, object]) -> Ticket:
+        ticket = self.get(organization_id, ticket_id)
+        author = self._text(data.get("author_id"), "author_id")
+        body = self._text(data.get("body"), "body")
+        updated = ticket.add_comment(Comment(author, body))
         self._repository.save(updated)
         return updated
 

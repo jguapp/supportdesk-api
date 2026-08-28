@@ -5,6 +5,15 @@ from datetime import datetime
 
 
 @dataclass(frozen=True, slots=True)
+class Comment:
+    author_id: str
+    body: str
+
+    def to_dict(self) -> dict[str, str]:
+        return {"author_id": self.author_id, "body": self.body}
+
+
+@dataclass(frozen=True, slots=True)
 class Ticket:
     id: str
     organization_id: str
@@ -13,9 +22,13 @@ class Ticket:
     status: str
     priority: str
     created_at: datetime
+    comments: tuple[Comment, ...] = ()
 
     def move_to(self, status: str) -> "Ticket":
         return replace(self, status=status)
+
+    def add_comment(self, comment: Comment) -> "Ticket":
+        return replace(self, comments=(*self.comments, comment))
 
     def to_dict(self) -> dict[str, object]:
         return {
@@ -24,6 +37,7 @@ class Ticket:
             "status": self.status,
             "priority": self.priority,
             "created_at": self.created_at.isoformat(),
+            "comments": [comment.to_dict() for comment in self.comments],
         }
 
 
