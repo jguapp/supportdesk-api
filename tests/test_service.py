@@ -33,6 +33,9 @@ class TicketServiceTests(unittest.TestCase):
         with self.assertRaises(ValidationError):
             self.service.create("org1", "u1", {"subject": "Help", "priority": "now"})
 
+    def test_search_matches_subject_case_insensitively(self):
+        self.assertEqual(["t1"], [ticket.id for ticket in self.service.search("org1", query="LOG IN")])
+
 
 if __name__ == "__main__":
     unittest.main()

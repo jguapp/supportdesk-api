@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from http import HTTPStatus
+from urllib.parse import parse_qs
 
 from .service import ConflictError, NotFoundError, TicketService, ValidationError
 
@@ -18,6 +19,14 @@ class SupportDeskApi:
             if method == "POST" and path == "/tickets":
                 ticket = self._service.create(organization, environ.get("HTTP_X_USER"), self._json(environ))
                 return self._respond(start_response, HTTPStatus.CREATED, ticket.to_dict())
+            if method == "GET" and path == "/tickets":
+                query = parse_qs(str(environ.get("QUERY_STRING", "")))
+                tickets = self._service.search(
+                    organization,
+                    query=query.get("q", [None])[0],
+                    status=query.get("status", [None])[0],
+                )
+                return self._respond(start_response, HTTPStatus.OK, {"items": [ticket.to_dict() for ticket in tickets]})
             if path.startswith("/tickets/"):
                 suffix = path.removeprefix("/tickets/")
                 if method == "PATCH" and suffix.endswith("/status"):
@@ -49,4 +58,3 @@ class SupportDeskApi:
         body = json.dumps(payload, separators=(",", ":")).encode()
         start_response(f"{status.value} {status.phrase}", [("Content-Type", "application/json")])
         return [body]
-
